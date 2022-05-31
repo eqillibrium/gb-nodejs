@@ -1,7 +1,5 @@
-import Events from 'events'
-import { App } from './2/App'
-import { LoggerService } from './2/Logger/logger.service'
+import { streamTransformService } from "./3/transformStream";
+import { streamFsService } from "./3/fsStreams";
 
-const app = new App(new LoggerService(), new Events())
-
-app.run()
+streamTransformService('access.log', '89.123.1.41')
+streamFsService('access.log', '34.48.240.111')
