@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "training project for the nodejs course",
   "main": "src/main.ts",
+  "type": "module",
+  "bin": {
+    "reader": "./dist/main.js"
+  },
+
   "scripts": {
     "dev": "nodemon",
     "start": "node ./dist/main.js",
@@ -11,10 +16,14 @@
   "author": "naerdel",
   "license": "ISC",
   "dependencies": {
+    "@types/inquirer": "^8.2.1",
     "colors": "^1.4.0",
-    "tslog": "^3.3.1"
+    "inquirer": "^8.2.4",
+    "tslog": "^3.3.1",
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
+    "@types/yargs": "^17.0.10",
     "nodemon": "^2.0.15",
     "ts-node": "^10.5.0",
     "typescript": "^4.5.5"

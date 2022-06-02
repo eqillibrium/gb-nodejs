@@ -1,5 +1,3 @@
-import { streamTransformService } from "./3/transformStream";
-import { streamFsService } from "./3/fsStreams";
+import { bootstrap } from './4/app.js'
 
-streamTransformService('access.log', '89.123.1.41')
-streamFsService('access.log', '34.48.240.111')
+await bootstrap()
