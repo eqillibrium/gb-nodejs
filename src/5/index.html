@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        .cell {
+            cursor: pointer;
+            transition: all .3s;
+        }
+        .cell:hover {
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-group mb-3">
+            <span class="input-group-text">Путь к файлу</span>
+            <input type="text" class="form-control" placeholder="C:\path\to\file" aria-label="pathToFile" id="path">
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-init">Показать файлы</button>
+        <table class="table mt-3">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Файлы и папки</th>
+            </tr>
+            </thead>
+            <tbody id="fileTableBody">
+
+            </tbody>
+        </table>
+        <div class="mb-3">
+            <label for="text" class="form-label">Текст файла</label>
+            <textarea class="form-control" id="text" rows="13"></textarea>
+        </div>
+    </div>
+<script>
+
+    class App {
+
+        constructor() {
+            this.fileTableBody = document.querySelector('#fileTableBody')
+            this.pathInput = document.querySelector('#path')
+            this.textArea = document.querySelector('#text')
+            this.btn =document.querySelector('#btn-init')
+            this.fileTableCells = []
+            this.data = {}
+        }
+
+        init () {
+            this.btn.addEventListener('click', async () => {
+                await this.run()
+            })
+        }
+
+        async run() {
+            await this.post()
+            this.render()
+            this.pathInput.value = this.data?.currentDir
+            this.addListenerOnCells()
+            this.textArea.value = this.data?.text
+        }
+
+        async post () {
+            let body = { path: this.pathInput.value }
+            const response = await fetch('http://localhost:3000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(body)
+            })
+            this.data = await response.json()
+        }
+
+        render() {
+            let html = ''
+            this.data?.files.forEach((el, idx) => {
+                html +=
+                    `<tr class="cell">
+                        <th scope="row">${idx + 1}</th>
+                        <td class="cellField">${el}</td>
+                    </tr>`
+            })
+            this.fileTableBody.innerHTML = html
+            this.fileTableCells = document.querySelectorAll('.cellField')
+        }
+
+        addListenerOnCells() {
+            this.fileTableCells.forEach(el => el.addEventListener('click', () => {
+                this.pathInput.value += '\\' + el.textContent
+            }))
+        }
+    }
+
+    const app = new App()
+    app.init()
+
+</script>
+</body>
+</html>
