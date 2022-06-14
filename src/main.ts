@@ -1,3 +1,3 @@
-import { bootstrap } from './5/App.js'
+import { bootstrap } from './6/App.js'
 
 await bootstrap()

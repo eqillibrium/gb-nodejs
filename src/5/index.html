@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
     <style>
         .cell {
             cursor: pointer;
@@ -11,6 +12,10 @@
         }
         .cell:hover {
             background-color: lightgray;
+        }
+
+        .hide {
+            display: none;
         }
     </style>
 </head>
@@ -20,7 +25,12 @@
             <span class="input-group-text">Путь к файлу</span>
             <input type="text" class="form-control" placeholder="C:\path\to\file" aria-label="pathToFile" id="path">
         </div>
-        <button type="button" class="btn btn-primary" id="btn-init">Показать файлы</button>
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-primary" id="btn-init">Показать cодержимое</button>
+            <div class="d-flex">
+                <p>Подключено пользователей к приложению: <strong id="countOfUsers"></strong></p>
+            </div>
+        </div>
         <table class="table mt-3">
             <thead>
             <tr>
@@ -36,6 +46,11 @@
             <label for="text" class="form-label">Текст файла</label>
             <textarea class="form-control" id="text" rows="13"></textarea>
         </div>
+        <div class="input-group mb-3" id="searchDiv">
+            <span class="input-group-text">Поиск текста по файлу</span>
+            <input type="text" class="form-control" aria-label="pathToFile" id="searchString">
+            <button type="button" class="btn btn-primary" id="btn-search">Искать</button>
+        </div>
     </div>
 <script>
 
@@ -43,29 +58,41 @@
 
         constructor() {
             this.fileTableBody = document.querySelector('#fileTableBody')
+            this.searchString = document.querySelector('#searchString')
             this.pathInput = document.querySelector('#path')
+            this.searchDiv = document.querySelector('#searchDiv')
             this.textArea = document.querySelector('#text')
-            this.btn =document.querySelector('#btn-init')
+            this.initBtn =document.querySelector('#btn-init')
+            this.searchBtn =document.querySelector('#btn-search')
             this.fileTableCells = []
             this.data = {}
         }
 
         init () {
-            this.btn.addEventListener('click', async () => {
+            this.initBtn.addEventListener('click', async () => {
                 await this.run()
             })
+            this.searchDiv.classList.add('hide')
         }
 
         async run() {
-            await this.post()
+            await this.post( { path: this.pathInput.value })
             this.render()
             this.pathInput.value = this.data?.currentDir
             this.addListenerOnCells()
             this.textArea.value = this.data?.text
+            if (this.textArea.value === '') {
+                this.searchDiv.classList.add('hide')
+            } else {
+                this.searchDiv.classList.remove('hide')
+                this.searchBtn.addEventListener('click', async () => {
+                    await this.post({ search: true, path: this.pathInput.value, searchString: this.searchString.value})
+                    this.textArea.value = this.data.text
+                })
+            }
         }
 
-        async post () {
-            let body = { path: this.pathInput.value }
+        async post (body = {}) {
             const response = await fetch('http://localhost:3000', {
                 method: 'POST',
                 headers: {
@@ -98,6 +125,16 @@
 
     const app = new App()
     app.init()
+
+    const socket = io('localhost:3000');
+
+    socket.on('connect', function() {
+        console.log('Successful connected to server');
+        socket.on('SERVER_MSG', function (data) {
+            console.log(data)
+            document.querySelector('#countOfUsers').textContent = data.connections
+        });
+    });
 
 </script>
 </body>

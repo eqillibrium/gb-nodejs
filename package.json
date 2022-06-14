@@ -7,7 +7,6 @@
   "bin": {
     "reader": "./dist/main.js"
   },
-
   "scripts": {
     "dev": "nodemon",
     "start": "node ./dist/main.js",
@@ -19,6 +18,7 @@
     "@types/inquirer": "^8.2.1",
     "colors": "^1.4.0",
     "inquirer": "^8.2.4",
+    "socket.io": "^4.5.1",
     "tslog": "^3.3.1",
     "yargs": "^17.5.1"
   },
